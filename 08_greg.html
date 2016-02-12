@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>08_template</title>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://bootswatch.com/cosmo/bootstrap.css">
+    <style>
+    .jumbotron {
+      margin-bottom: 0;
+      background-color: #d1d1e0;
+    }
+
+    #chart1 {
+        background: yellow;
+    }
+    </style>
+</head>
+
+<body>
+<div class="jumbotron">
+  <div class="container text-center">
+    <h1>Wifi Strength</h1> 
+  </div>
+</div>
+
+<h3>Wifi signal strength <span id="signal">...</span></h3>
+    <div>
+        <canvas id="chart1" height="450" width="600"></canvas>
+    </div>
+    <div class="container">    
+  <div class="row">
+    <div class="col-sm-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading">Chart</div>
+        <div class="panel-body"> <canvas id="chart1" height="450" width="600"></canvas></div>
+        <div class="panel-footer"></div>
+      </div>
+    </div>
+    <div class="col-sm-4"> 
+      <div class="panel panel-primary">
+        <div class="panel-heading">Chart</div>
+        <div class="panel-body"> <canvas id="chart1" height="450" width="600"></canvas></div>
+        <div class="panel-footer"></div>
+      </div>
+    </div>
+    
+    <div class="col-sm-4"> 
+      <div class="panel panel-primary">
+        <div class="panel-heading">Chart</div>
+        <div class="panel-body"> <canvas id="chart1" height="450" width="600"></canvas></div>
+      </div>
+    </div>
+  </div>
+  
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.js"></script>
+
+    <script>
+    lineChartData = {
+        labels: ["-9", "-8", "-7", "-6", "-5", "-4", "-3", "-2", "-1", "now"],
+        datasets: [{
+            // fillColor: "rgba(151,187,205,0.5)",
+            // strokeColor: "rgba(151,187,205,1)",
+            // pointColor: "rgba(151,187,205,1)",
+            // pointStrokeColor: "#fff",
+            data: [null,null,null,null,null,null,null,null,null,null]
+        }]
+    };
+
+
+    function initLine() {
+        var options = {
+            animation: false,
+            scaleOverride: true,
+            scaleSteps: 10, // The number of steps in a hard coded scale
+            scaleStepWidth: 10, // The value jump in the hard coded scale
+            scaleStartValue: 10 // The scale starting value
+        };
+        var ctx = $("#chart1").get(0).getContext("2d");
+        var myLine = new Chart(ctx).Line(lineChartData, options);
+    }
+
+    var socket = io('/');
+    socket.on('pushdata', function(data) {
+        $('#signal').text(data);
+        lineChartData.datasets[0].data.shift();
+        lineChartData.datasets[0].data.push(data);
+        initLine();
+    });
+    </script>
+
+    </body>
+
+</html>
